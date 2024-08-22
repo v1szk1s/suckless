@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
 patches
+dwm
 
 # Object files
 *.o

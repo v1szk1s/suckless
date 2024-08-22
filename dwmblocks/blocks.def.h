@@ -9,6 +9,8 @@ static const Block blocks[] = {
 	/*Icon*/	/*Command*/		/*Update Interval*/	/*Update Signal*/
 	{"", "free -h | awk '/^Mem/ { print $2\"/\"$3 }' | sed s/i//g",	10,		0},
 
+	{"", "battery",	30,		0},
+
 	{"", "date '+%y.%m.%d (%a) %H:%M'",					5,		0},
 };
 

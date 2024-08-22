@@ -18,7 +18,7 @@ static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
+static const char col_cyan[]        = "#5cb5b5";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -66,29 +66,34 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-l", "15", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "st", NULL };
-static const char *toggle_kb[]  = { "toggle-kb", NULL };
+static const char *toggle_kb_cmd[]  = { "toggle-kb", NULL };
 
-static const char *upvol[] = { "vol-set", "up", NULL };
-static const char *downvol[] = { "vol-set", "down", NULL };
-static const char *mutevol[] = { "vol-set", "mute", NULL };
+static const char *screenshot_cmd[]  = { "scrot", "-s", "~/pictures/%Y-%m-%d-$T-screenshot.png", NULL };
 
-static const char *light_up[]   = { "/usr/bin/light",   "-A", "5", NULL };
-static const char *light_down[] = { "/usr/bin/light",   "-U", "5", NULL };
+static const char *upvol_cmd[] = { "vol-set", "up", NULL };
+static const char *downvol_cmd[] = { "vol-set", "down", NULL };
+static const char *mutevol_cmd[] = { "vol-set", "mute", NULL };
 
-static const char *slock[] = { "slock", NULL };
+static const char *light_up_cmd[]   = { "/usr/bin/light",   "-A", "5", NULL };
+static const char *light_down_cmd[] = { "/usr/bin/light",   "-U", "5", NULL };
+
+static const char *slock_cmd[] = { "slock", NULL };
+
+static const char *firefox_cmd[] = { "firefox", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-  { 0,                       XF86XK_AudioLowerVolume, spawn, {.v = downvol } },
-	{ 0,                       XF86XK_AudioMute, spawn, {.v = mutevol } },
-	{ 0,                       XF86XK_AudioRaiseVolume, spawn, {.v = upvol   } },
-  { 0,				XF86XK_MonBrightnessUp,		spawn,	{.v = light_up} },
-	{ 0,				XF86XK_MonBrightnessDown,	spawn,	{.v = light_down} },
+  { 0,                       XF86XK_AudioLowerVolume, spawn, {.v = downvol_cmd } },
+	{ 0,                       XF86XK_AudioMute, spawn, {.v = mutevol_cmd } },
+	{ 0,                       XF86XK_AudioRaiseVolume, spawn, {.v = upvol_cmd   } },
+  { 0,				XF86XK_MonBrightnessUp,		spawn,	{.v = light_up_cmd} },
+	{ 0,				XF86XK_MonBrightnessDown,	spawn,	{.v = light_down_cmd} },
 	{ Mod4Mask,                       XK_space,  spawn,          {.v = dmenucmd } },
 	{ Mod4Mask,                       XK_Return, spawn,          {.v = termcmd } },
-	{ Mod4Mask,                       XK_l, spawn,          {.v = slock } },
-	// { Mod4Mask|ControlMask,         XK_space,  spawn,          {.v = toggle_kb } },
-	{ MODKEY,                       XK_space,  spawn,          {.v = toggle_kb } },
+	{ Mod4Mask,                       XK_l, spawn,          {.v = slock_cmd } },
+	{ Mod4Mask,                       XK_s, spawn,          {.v = screenshot_cmd } },
+	{ Mod4Mask,                       XK_f, spawn,          {.v = firefox_cmd } },
+	{ MODKEY|ControlMask,                       XK_space,  spawn,          {.v = toggle_kb_cmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -97,7 +102,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_Return, zoom,           {2} },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
+	/*{ MODKEY,                       XK_Tab,    view,           {0} },*/
 	{ Mod4Mask,                     XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
@@ -110,10 +115,6 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_x,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_c, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_x,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_c, tagmon,         {.i = +1 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
