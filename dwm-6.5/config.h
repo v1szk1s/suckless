@@ -33,9 +33,13 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	/* class          instance    title       tags mask     isfloating   monitor */
+	{ "Gimp",         NULL,       NULL,       0,            1,           -1 },
+	{ "st-256color",  NULL,       NULL,       1 << 0,       0,           -1 },
+	{ "firefox",      NULL,       NULL,       1 << 1,       0,           -1 },
+	{ "rdesktop",      NULL,       NULL,       1 << 2,       0,           -1 },
+	{ "discord",      NULL,       NULL,       1 << 3,       0,           -1 },
+	{ "keepassxc",      NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
@@ -60,7 +64,7 @@ static const Layout layouts[] = {
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+#define SHCMD(cmd) { .v = (const char*[]){ "/bin/zsh", "-c", cmd, NULL } }
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
@@ -68,7 +72,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-l", "15", "-fn"
 static const char *termcmd[]  = { "st", NULL };
 static const char *toggle_kb_cmd[]  = { "toggle-kb", NULL };
 
-static const char *screenshot_cmd[]  = { "scrot", "-s", "~/pictures/%Y-%m-%d-$T-screenshot.png", NULL };
+static const char *screenshot_cmd[]  = { "screenshot.sh", NULL };
 
 static const char *upvol_cmd[] = { "vol-set", "up", NULL };
 static const char *downvol_cmd[] = { "vol-set", "down", NULL };
@@ -80,6 +84,7 @@ static const char *light_down_cmd[] = { "/usr/bin/light",   "-U", "5", NULL };
 static const char *slock_cmd[] = { "slock", NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
+static const char *discord_cmd[] = { "discord", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -93,6 +98,7 @@ static const Key keys[] = {
 	{ Mod4Mask,                       XK_l, spawn,          {.v = slock_cmd } },
 	{ Mod4Mask,                       XK_s, spawn,          {.v = screenshot_cmd } },
 	{ Mod4Mask,                       XK_f, spawn,          {.v = firefox_cmd } },
+	{ Mod4Mask,                       XK_d, spawn,          {.v = discord_cmd } },
 	{ MODKEY|ControlMask,                       XK_space,  spawn,          {.v = toggle_kb_cmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
