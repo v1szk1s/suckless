@@ -39,7 +39,7 @@ static const Rule rules[] = {
 	{ "firefox",      NULL,       NULL,       1 << 1,       0,           -1 },
 	{ "rdesktop",      NULL,       NULL,       1 << 2,       0,           -1 },
 	{ "discord",      NULL,       NULL,       1 << 3,       0,           -1 },
-	{ "keepassxc",      NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "KeePassXC",      NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
@@ -78,13 +78,19 @@ static const char *upvol_cmd[] = { "vol-set", "up", NULL };
 static const char *downvol_cmd[] = { "vol-set", "down", NULL };
 static const char *mutevol_cmd[] = { "vol-set", "mute", NULL };
 
-static const char *light_up_cmd[]   = { "/usr/bin/light",   "-A", "5", NULL };
-static const char *light_down_cmd[] = { "/usr/bin/light",   "-U", "5", NULL };
+static const char *light_up_cmd[]   = { "/usr/bin/brightnessctl",   "set", "+5%", NULL };
+static const char *light_down_cmd[] = { "/usr/bin/brightnessctl",   "set", "5%-", NULL };
 
 static const char *slock_cmd[] = { "slock", NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
 static const char *discord_cmd[] = { "discord", NULL };
+
+static const char *monitor_cmd[] = { "monitor.sh", NULL };
+static const char *vpn_cmd[] = { "vpn", NULL };
+
+static const char *shutdown_cmd[] = { "shutdown", "now", NULL };
+static const char *reboot_cmd[] = { "reboot", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -99,6 +105,10 @@ static const Key keys[] = {
 	{ Mod4Mask,                       XK_s, spawn,          {.v = screenshot_cmd } },
 	{ Mod4Mask,                       XK_f, spawn,          {.v = firefox_cmd } },
 	{ Mod4Mask,                       XK_d, spawn,          {.v = discord_cmd } },
+	{ Mod4Mask,                       XK_p, spawn,          {.v = monitor_cmd } },
+	{ Mod4Mask,                       XK_v, spawn,          {.v = vpn_cmd } },
+	{ MODKEY|ShiftMask|ControlMask|Mod4Mask,             XK_r, spawn,         {.v = reboot_cmd } },
+	{ MODKEY|ShiftMask|ControlMask|Mod4Mask,             XK_q, spawn,         {.v = shutdown_cmd } },
 	{ MODKEY|ControlMask,                       XK_space,  spawn,          {.v = toggle_kb_cmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
