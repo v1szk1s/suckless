@@ -81,7 +81,7 @@ static const char *mutevol_cmd[] = { "vol-set", "mute", NULL };
 static const char *light_up_cmd[]   = { "/usr/bin/brightnessctl",   "set", "+5%", NULL };
 static const char *light_down_cmd[] = { "/usr/bin/brightnessctl",   "set", "5%-", NULL };
 
-static const char *slock_cmd[] = { "slock", NULL };
+static const char *slock_cmd[] = { "lock.sh", NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
 static const char *discord_cmd[] = { "discord", NULL };

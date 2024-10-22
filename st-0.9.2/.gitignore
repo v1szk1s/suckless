@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
 patches
+st
 
 # Object files
 *.o

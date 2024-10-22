@@ -132,7 +132,7 @@ static const char *colorname[] = {
                                    
     /* special colors */
     [256] = "#282a36", /* background */
-    [257] = "#f8f8f2", /* foreground */
+    [257] = "#14e0e0", /* foreground */
 
 };
 
@@ -214,6 +214,7 @@ static Shortcut shortcuts[] = {
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
 	{ ControlMask,          XK_equal,       zoom,           {.f = +1} },
+	{ ControlMask|ShiftMask, XK_plus,       zoom,           {.f = +1} },
 	{ ControlMask,          XK_minus,        zoom,           {.f = -1} },
 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },

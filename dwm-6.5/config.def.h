@@ -26,7 +26,7 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "", "", "", "", "", "" };
+static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -81,7 +81,7 @@ static const char *mutevol_cmd[] = { "vol-set", "mute", NULL };
 static const char *light_up_cmd[]   = { "/usr/bin/brightnessctl",   "set", "+5%", NULL };
 static const char *light_down_cmd[] = { "/usr/bin/brightnessctl",   "set", "5%-", NULL };
 
-static const char *slock_cmd[] = { "slock", NULL };
+static const char *slock_cmd[] = { "lock.sh", NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
 static const char *discord_cmd[] = { "discord", NULL };
