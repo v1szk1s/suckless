@@ -3,7 +3,7 @@
 #include <X11/XF86keysym.h>
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 5;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayonleft = 0;    /* 0: systray in the right corner, >0: systray on left of status text */
@@ -12,8 +12,11 @@ static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display 
 static const int showsystray        = 1;        /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
+static const char *fonts[]          = {
+	"Hack Nerd Font:size=12",
+	"monospace:size=12" 
+};
+static const char dmenufont[]       = "monospace:size=14";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -26,7 +29,8 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "", "󰈹", "", "", "", "", "", "", "󰌆" };
+
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -38,7 +42,7 @@ static const Rule rules[] = {
 	{ "st-256color",  NULL,       NULL,       1 << 0,       0,           -1 },
 	{ "firefox",      NULL,       NULL,       1 << 1,       0,           -1 },
 	{ "rdesktop",      NULL,       NULL,       1 << 2,       0,           -1 },
-	{ "discord",      NULL,       NULL,       1 << 3,       0,           -1 },
+	{ "discord",      NULL,       NULL,       1 << 7,       0,           -1 },
 	{ "KeePassXC",      NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
@@ -66,81 +70,94 @@ static const Layout layouts[] = {
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/zsh", "-c", cmd, NULL } }
 
+#define BIN(cmd) "/home/v1szk1s/.dotfiles/bin/dwm/" cmd
+
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-l", "15", "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+
 static const char *termcmd[]  = { "st", NULL };
-static const char *toggle_kb_cmd[]  = { "toggle-kb", NULL };
-
-static const char *screenshot_cmd[]  = { "screenshot.sh", NULL };
-
-static const char *upvol_cmd[] = { "vol-set", "up", NULL };
-static const char *downvol_cmd[] = { "vol-set", "down", NULL };
-static const char *mutevol_cmd[] = { "vol-set", "mute", NULL };
-
+static const char *toggle_kb_cmd[]  = { BIN("toggle-kb"), NULL };
+static const char *screenshot_cmd[]  = { BIN("screenshot.sh"), NULL };
+static const char *upvol_cmd[] = { BIN("vol-set"), "up", NULL };
+static const char *downvol_cmd[] = { BIN("vol-set"), "down", NULL };
+static const char *mutevol_cmd[] = { BIN("vol-set"), "mute", NULL };
+static const char *networkmanager_dmenu_cmd[] = { BIN("networkmanager_dmenu"), NULL };
+static const char *bluetooth_dmenu_cmd[] = { BIN("bluetooth_dmenu"), NULL };
 static const char *light_up_cmd[]   = { "/usr/bin/brightnessctl",   "set", "+5%", NULL };
 static const char *light_down_cmd[] = { "/usr/bin/brightnessctl",   "set", "5%-", NULL };
-
-static const char *slock_cmd[] = { "lock.sh", NULL };
+static const char *light_up_small_cmd[]   = { "/usr/bin/brightnessctl",   "set", "+1%", NULL };
+static const char *light_down_small_cmd[] = { "/usr/bin/brightnessctl",   "set", "1%-", NULL };
+static const char *lock_cmd[] = { "slock", NULL };
+static const char *sound_cmd[] = { BIN("sound"), NULL };
+static const char *monitor_cmd[] = { BIN("monitor.sh"), NULL };
+static const char *shutdown_cmd[] = { "shutdown", "now", NULL };
+static const char *reboot_cmd[] = { "reboot", NULL };
+static const char *suspend_cmd[] = { "systemctl", "suspend", NULL };
+static const char *hibernate_cmd[] = { "systemctl", "hibernate", NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
 static const char *discord_cmd[] = { "discord", NULL };
 
-static const char *monitor_cmd[] = { "monitor.sh", NULL };
-static const char *vpn_cmd[] = { "vpn", NULL };
-
-static const char *shutdown_cmd[] = { "shutdown", "now", NULL };
-static const char *reboot_cmd[] = { "reboot", NULL };
-
 static const Key keys[] = {
-	/* modifier                     key        function        argument */
-  { 0,                       XF86XK_AudioLowerVolume, spawn, {.v = downvol_cmd } },
-	{ 0,                       XF86XK_AudioMute, spawn, {.v = mutevol_cmd } },
-	{ 0,                       XF86XK_AudioRaiseVolume, spawn, {.v = upvol_cmd   } },
-  { 0,				XF86XK_MonBrightnessUp,		spawn,	{.v = light_up_cmd} },
-	{ 0,				XF86XK_MonBrightnessDown,	spawn,	{.v = light_down_cmd} },
-	{ Mod4Mask,                       XK_space,  spawn,          {.v = dmenucmd } },
-	{ Mod4Mask,                       XK_Return, spawn,          {.v = termcmd } },
-	{ Mod4Mask,                       XK_l, spawn,          {.v = slock_cmd } },
-	{ Mod4Mask,                       XK_s, spawn,          {.v = screenshot_cmd } },
-	{ Mod4Mask,                       XK_f, spawn,          {.v = firefox_cmd } },
-	{ Mod4Mask,                       XK_d, spawn,          {.v = discord_cmd } },
-	{ Mod4Mask,                       XK_p, spawn,          {.v = monitor_cmd } },
-	{ Mod4Mask,                       XK_v, spawn,          {.v = vpn_cmd } },
-	{ MODKEY|ShiftMask|ControlMask|Mod4Mask,             XK_r, spawn,         {.v = reboot_cmd } },
-	{ MODKEY|ShiftMask|ControlMask|Mod4Mask,             XK_q, spawn,         {.v = shutdown_cmd } },
-	{ MODKEY|ControlMask,                       XK_space,  spawn,          {.v = toggle_kb_cmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY,                       XK_Return, zoom,           {2} },
-	/*{ MODKEY,                       XK_Tab,    view,           {0} },*/
-	{ Mod4Mask,                     XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	// { MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
-	TAGKEYS(                        XK_6,                      5)
-	TAGKEYS(                        XK_7,                      6)
-	TAGKEYS(                        XK_8,                      7)
-	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	/* modifier							key							function        argument */
+	{ 0,								XF86XK_AudioLowerVolume,	spawn,			{.v = downvol_cmd } },
+	{ 0,								XF86XK_AudioMute,			spawn,			{.v = mutevol_cmd } },
+	{ 0,								XF86XK_AudioRaiseVolume,	spawn,			{.v = upvol_cmd   } },
+	{ 0,								XF86XK_MonBrightnessUp,		spawn,			{.v = light_up_cmd} },
+	{ 0,								XF86XK_MonBrightnessDown,	spawn,			{.v = light_down_cmd} },
+	{ ShiftMask,						XF86XK_MonBrightnessUp,		spawn,			{.v = light_up_small_cmd} },
+	{ ShiftMask,						XF86XK_MonBrightnessDown,	spawn,			{.v = light_down_small_cmd} },
+
+	{ Mod4Mask|ShiftMask,				XK_q,						spawn,			{.v = shutdown_cmd } },
+	{ Mod4Mask|ShiftMask,				XK_r,						spawn,			{.v = reboot_cmd} },
+	{ Mod4Mask|ShiftMask,				XK_s,						spawn,			{.v = suspend_cmd } },
+	{ Mod4Mask|ShiftMask,				XK_h,						spawn,			{.v = hibernate_cmd } },
+
+	{ Mod4Mask,							XK_space,					spawn,			{.v = dmenucmd } },
+	{ Mod4Mask,							XK_Return,					spawn,			{.v = termcmd } },
+	{ Mod4Mask,							XK_s,						spawn,			{.v = sound_cmd } },
+	{ Mod4Mask,							XK_l,						spawn,			{.v = lock_cmd } },
+	{ Mod4Mask,							XK_f,						spawn,			{.v = firefox_cmd } },
+	{ Mod4Mask,							XK_d,						spawn,			{.v = discord_cmd } },
+	{ Mod4Mask,							XK_p,						spawn,			{.v = monitor_cmd } },
+	{ Mod4Mask,							XK_w,						spawn,			{.v = networkmanager_dmenu_cmd } },
+	{ Mod4Mask,							XK_b,						spawn,			{.v = bluetooth_dmenu_cmd } },
+	{ Mod4Mask,							XK_q,						killclient,     {0} },
+
+	{ MODKEY|ControlMask,				XK_s,						spawn,			{.v = screenshot_cmd } },
+	{ MODKEY|ControlMask,               XK_space,					spawn,          {.v = toggle_kb_cmd } },
+
+	{ MODKEY,							XK_b,      					togglebar,      {0} },
+	{ MODKEY,                      		XK_j,      					focusstack,     {.i = +1 } },
+	{ MODKEY,                      		XK_k,      					focusstack,     {.i = -1 } },
+	{ MODKEY,                      		XK_i,      					incnmaster,     {.i = +1 } },
+	{ MODKEY,                      		XK_d,      					incnmaster,     {.i = -1 } },
+	{ MODKEY,                      		XK_h,      					setmfact,       {.f = -0.05} },
+	{ MODKEY,                      		XK_l,      					setmfact,       {.f = +0.05} },
+	{ MODKEY,                      		XK_Return, 					zoom,           {2} },
+	/*{ MODKEY,                    		  XK_Tab,					view,           {0} },*/
+	{ MODKEY,                      		XK_t,						setlayout,      {.v = &layouts[0]} },
+	{ MODKEY,                      		XK_f,      setlayout,      {.v = &layouts[1]} },
+	{ MODKEY,                      		XK_m,      setlayout,      {.v = &layouts[2]} },
+	// { MODKEY,                   		   XK_space,  setlayout,      {0} },
+	{ MODKEY|ShiftMask,            		XK_space,  togglefloating, {0} },
+	{ MODKEY,                      		XK_0,      view,           {.ui = ~0 } },
+	{ MODKEY|ShiftMask,            		XK_0,      tag,            {.ui = ~0 } },
+	{ MODKEY,                      		XK_comma,  focusmon,       {.i = -1 } },
+	{ MODKEY,                      		XK_period, focusmon,       {.i = +1 } },
+	{ MODKEY|ShiftMask,            		XK_comma,  tagmon,         {.i = -1 } },
+	{ MODKEY|ShiftMask,            		XK_period, tagmon,         {.i = +1 } },
+	TAGKEYS(                       		XK_1,                      0)
+	TAGKEYS(                       		XK_2,                      1)
+	TAGKEYS(                       		XK_3,                      2)
+	TAGKEYS(                       		XK_4,                      3)
+	TAGKEYS(                       		XK_5,                      4)
+	TAGKEYS(                       		XK_6,                      5)
+	TAGKEYS(                       		XK_7,                      6)
+	TAGKEYS(                       		XK_8,                      7)
+	TAGKEYS(                       		XK_9,                      8)
+	{ MODKEY|ShiftMask,            		XK_q,      quit,           {0} },
 };
 
 /* button definitions */

@@ -821,7 +821,8 @@ drawbar(Monitor *m)
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		
+		drw_text(drw, x, 0, w, bh, lrpad / 3, tags[i], urg & 1 << i);
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxw, 0, w - ( 2 * boxw + 1), 2,
 			    m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
@@ -2506,6 +2507,8 @@ zoom(const Arg *arg)
 		return;
 	pop(c);
 }
+
+
 
 int
 main(int argc, char *argv[])

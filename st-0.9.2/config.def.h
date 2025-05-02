@@ -5,7 +5,7 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "Hack Nerd Font Mono:size=9:antialias=true:autohint=true";
+static char *font = "Hack Nerd Font Mono:size=16:antialias=true:autohint=true";
 static int borderpx = 0;
 
 /*
@@ -111,31 +111,29 @@ float alpha = 0.9;
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
     /* 8 normal colors */
-    [0] = "#000000", /* black   */
+    [0] = "#282a36", /* black   - dark backgroundish */
     [1] = "#ff5555", /* red     */
     [2] = "#50fa7b", /* green   */
     [3] = "#f1fa8c", /* yellow  */
     [4] = "#bd93f9", /* blue    */
     [5] = "#ff79c6", /* magenta */
     [6] = "#8be9fd", /* cyan    */
-    [7] = "#cccccc", /* white   */
-                                  
+    [7] = "#f8f8f2", /* white   - soft white */
+
     /* 8 bright colors */
-    [8]  = "#64698f", /* black   */
-    [9]  = "#ff5555", /* red     */
-    [10] = "#50fa7b", /* green   */
-    [11] = "#f1fa8c", /* yellow  */
-    [12] = "#bd93f9", /* blue    */
-    [13] = "#ff79c6", /* magenta */
-    [14] = "#8be9fd", /* cyan    */
-    [15] = "#ffffff", /* white   */
-                                   
+    [8]  = "#6272a4", /* bright black (greyish) */
+    [9]  = "#ff6e6e", /* bright red */
+    [10] = "#69ff94", /* bright green */
+    [11] = "#ffffa5", /* bright yellow */
+    [12] = "#d6acff", /* bright blue */
+    [13] = "#ff92df", /* bright magenta */
+    [14] = "#a4ffff", /* bright cyan */
+    [15] = "#ffffff", /* bright white */
+
     /* special colors */
-    [256] = "#282a36", /* background */
-    [257] = "#14e0e0", /* foreground */
-
+    [256] = "#1e1f29", /* background - a little darker */
+    [257] = "#f8f8f2", /* foreground (text color) */
 };
-
 
 /*
  * Default colors (colorname index)
