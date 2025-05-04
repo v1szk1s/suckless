@@ -21,6 +21,7 @@
 #include <X11/Xutil.h>
 #include <security/pam_appl.h>
 #include <security/pam_misc.h>
+#include <X11/extensions/dpms.h>
 
 #include "arg.h"
 #include "util.h"
@@ -287,7 +288,7 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 			    IsPrivateKeypadKey(ksym))
 				continue;
 			switch (ksym) {
-			case XK_Return:
+			case XK_Return: 
 				passwd[len] = '\0';
 				errno = 0;
 				retval = pam_start(pam_service, hash, &pamc, &pamh);
@@ -311,13 +312,17 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 					fprintf(stderr, "slock: %s\n", pam_strerror(pamh, retval));
 				pam_end(pamh, retval);
 				if (running) {
-					XBell(dpy, 100);
+					// XBell(dpy, 100);
 					failure = 1;
 				}
 				explicit_bzero(&passwd, sizeof(passwd));
 				len = 0;
 				break;
 			case XK_Escape:
+				if(len == 0) {
+					system("xset -display :0.0 dpms force off");
+					break;
+				}
 				explicit_bzero(&passwd, sizeof(passwd));
 				len = 0;
 				break;
