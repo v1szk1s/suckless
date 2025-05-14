@@ -19,9 +19,14 @@
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/XF86keysym.h>
 #include <security/pam_appl.h>
 #include <security/pam_misc.h>
 #include <X11/extensions/dpms.h>
+
+/*POSIX threading for auto-timeout*/
+#include <pthread.h>
+#include <time.h>
 
 #include "arg.h"
 #include "util.h"
@@ -288,55 +293,67 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 			    IsPrivateKeypadKey(ksym))
 				continue;
 			switch (ksym) {
-			case XK_Return: 
-				passwd[len] = '\0';
-				errno = 0;
-				retval = pam_start(pam_service, hash, &pamc, &pamh);
-				color = PAM;
-				for (screen = 0; screen < nscreens; screen++) {
-					XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[color]);
-					XClearWindow(dpy, locks[screen]->win);
-					XRaiseWindow(dpy, locks[screen]->win);
-				}
-				XSync(dpy, False);
-
-				if (retval == PAM_SUCCESS)
-					retval = pam_authenticate(pamh, 0);
-				if (retval == PAM_SUCCESS)
-					retval = pam_acct_mgmt(pamh, 0);
-
-				running = 1;
-				if (retval == PAM_SUCCESS)
-					running = 0;
-				else
-					fprintf(stderr, "slock: %s\n", pam_strerror(pamh, retval));
-				pam_end(pamh, retval);
-				if (running) {
-					// XBell(dpy, 100);
-					failure = 1;
-				}
-				explicit_bzero(&passwd, sizeof(passwd));
-				len = 0;
-				break;
-			case XK_Escape:
-				if(len == 0) {
-					system("xset -display :0.0 dpms force off");
+				case XF86XK_AudioPlay:
+				case XF86XK_AudioStop:
+				case XF86XK_AudioPrev:
+				case XF86XK_AudioNext:
+				case XF86XK_AudioRaiseVolume:
+				case XF86XK_AudioLowerVolume:
+				case XF86XK_AudioMute:
+				case XF86XK_AudioMicMute:
+				case XF86XK_MonBrightnessDown:
+				case XF86XK_MonBrightnessUp:
+					XSendEvent(dpy, DefaultRootWindow(dpy), True, KeyPressMask, &ev);
 					break;
-				}
-				explicit_bzero(&passwd, sizeof(passwd));
-				len = 0;
-				break;
-			case XK_BackSpace:
-				if (len)
-					passwd[--len] = '\0';
-				break;
-			default:
-				if (num && !iscntrl((int)buf[0]) &&
-				    (len + num < sizeof(passwd))) {
-					memcpy(passwd + len, buf, num);
-					len += num;
-				}
-				break;
+				case XK_Return: 
+					passwd[len] = '\0';
+					errno = 0;
+					retval = pam_start(pam_service, hash, &pamc, &pamh);
+					color = PAM;
+					for (screen = 0; screen < nscreens; screen++) {
+						XSetWindowBackground(dpy, locks[screen]->win, locks[screen]->colors[color]);
+						XClearWindow(dpy, locks[screen]->win);
+						XRaiseWindow(dpy, locks[screen]->win);
+					}
+					XSync(dpy, False);
+
+					if (retval == PAM_SUCCESS)
+						retval = pam_authenticate(pamh, 0);
+					if (retval == PAM_SUCCESS)
+						retval = pam_acct_mgmt(pamh, 0);
+
+					running = 1;
+					if (retval == PAM_SUCCESS)
+						running = 0;
+					else
+						fprintf(stderr, "slock: %s\n", pam_strerror(pamh, retval));
+					pam_end(pamh, retval);
+					if (running) {
+						// XBell(dpy, 100);
+						failure = 1;
+					}
+					explicit_bzero(&passwd, sizeof(passwd));
+					len = 0;
+					break;
+				case XK_Escape:
+					if(len == 0) {
+						system("xset -display :0.0 dpms force off");
+						break;
+					}
+					explicit_bzero(&passwd, sizeof(passwd));
+					len = 0;
+					break;
+				case XK_BackSpace:
+					if (len)
+						passwd[--len] = '\0';
+					break;
+				default:
+					if (num && !iscntrl((int)buf[0]) &&
+						(len + num < sizeof(passwd))) {
+						memcpy(passwd + len, buf, num);
+						len += num;
+					}
+					break;
 			}
 			color = len ? INPUT : ((failure || failonclear) ? FAILED : INIT);
 			if (running && oldc != color) {
@@ -369,6 +386,18 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
 				XRaiseWindow(dpy, locks[screen]->win);
 		}
 	}
+}
+
+void *timeoutCommand(void *args)
+{
+	int runflag=0;
+	while (!runonce || !runflag)
+	{
+		sleep(timeoffset);
+		runflag = 1;
+		system(command);
+	}
+	return args;
 }
 
 static struct lock *
@@ -553,6 +582,10 @@ main(int argc, char **argv) {
 			_exit(1);
 		}
 	}
+
+	/*Start the auto-timeout command in its own thread*/
+	pthread_t thread_id;
+	pthread_create(&thread_id, NULL, timeoutCommand, NULL);
 
 	/* everything is now blank. Wait for the correct password */
 	readpw(dpy, &rr, locks, nscreens, hash);

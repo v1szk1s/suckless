@@ -38,13 +38,13 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class          instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",         NULL,       NULL,       0,            1,           -1 },
 	{ "st-256color",  NULL,       NULL,       1 << 0,       0,           -1 },
 	{ "firefox",      NULL,       NULL,       1 << 1,       0,           -1 },
 	{ "rdesktop",      NULL,       NULL,       1 << 2,       0,           -1 },
+	{ "Zathura",      NULL,       NULL,       1 << 4,       0,           -1 },
+	{ "Gimp",         NULL,       NULL,       1 << 6,       0,           -1 },
 	{ "discord",      NULL,       NULL,       1 << 7,       0,           -1 },
 	{ "KeePassXC",      NULL,       NULL,       1 << 8,       0,           -1 },
-	{ "Zathura",      NULL,       NULL,       1 << 4,       0,           -1 },
 };
 
 /* layout(s) */
@@ -97,6 +97,7 @@ static const char *reboot_cmd[] = { "reboot", NULL };
 static const char *suspend_cmd[] = { "systemctl", "suspend", NULL };
 static const char *hibernate_cmd[] = { "systemctl", "hibernate", NULL };
 static const char *tlp_dmenu_cmd[] = { BIN("tlp_dmenu"), NULL };
+static const char *umount_dmenu_cmd[] = { BIN("umount_dmenu"), NULL };
 
 static const char *firefox_cmd[] = { "firefox", NULL };
 static const char *discord_cmd[] = { "discord", NULL };
@@ -126,6 +127,7 @@ static const Key keys[] = {
 	{ Mod4Mask,							XK_w,						spawn,			{.v = networkmanager_dmenu_cmd } },
 	{ Mod4Mask,							XK_b,						spawn,			{.v = bluetooth_dmenu_cmd } },
 	{ Mod4Mask,							XK_t,						spawn,			{.v = tlp_dmenu_cmd } },
+	{ Mod4Mask,							XK_m,						spawn,			{.v = umount_dmenu_cmd } },
 	{ Mod4Mask,							XK_q,						killclient,     {0} },
 
 	{ MODKEY|ControlMask,				XK_s,						spawn,			{.v = screenshot_cmd } },
